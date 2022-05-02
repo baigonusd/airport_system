@@ -5,24 +5,24 @@ from rest_framework import serializers, exceptions
 from .models import Baggage, Airline, Ticket, BoardingPass
 
 
-class BaggageSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=90, required=True)
-    description = serializers.CharField(max_length=90, required=True)
-    weight = serializers.DecimalField(max_digits=5, decimal_places=2, required=True)
-    number = serializers.IntegerField(required=True)
-    status = serializers.IntegerField(required=True)
+class BaggageGetSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    weight = serializers.DecimalField(max_digits=5, decimal_places=2)
+    status = serializers.IntegerField()
+
+
+class BaggagePostSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=90)
+    description = serializers.CharField(max_length=90, required=False)
+    weight = serializers.DecimalField(max_digits=5, decimal_places=2)
+    status = serializers.IntegerField(required=False)
+    xray = serializers.ImageField(required=False)
 
     @transaction.atomic
     def create(self, validated_data):
-        baggage = {
-            "name": validated_data["name"],
-            "description": validated_data["description"],
-            "weight": validated_data["weight"],
-            "number": validated_data["number"],
-            "status": validated_data["status"],
-        }
-        baggage_created = Baggage.objects.create(**baggage)
-        return baggage_created
+        print(validated_data)
+        baggage = Baggage.objects.create(**validated_data)
+        return baggage
 
 
 class AirlineSerializer(serializers.Serializer):
@@ -78,7 +78,6 @@ class TicketPostSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        print(validated_data)
         ticket = Ticket.objects.create(
             passenger=self.context["request"].user.passenger_profile, **validated_data
         )
