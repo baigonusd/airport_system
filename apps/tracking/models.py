@@ -7,10 +7,7 @@ from utils.choices import baggage_choices, ticket_choices
 
 
 class Baggage(AbstractModel):
-    name = models.CharField("Name of the baggage", max_length=90)
-    description = models.CharField("Description", max_length=90, blank=True)
     weight = models.DecimalField("Weight of baggage", max_digits=5, decimal_places=2)
-    number = models.IntegerField("Number of baggage (2 boxes)", default=1)
     xray = models.ImageField(
         "Xray of baggage",
         upload_to="xrays",

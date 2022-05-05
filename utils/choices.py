@@ -23,8 +23,6 @@ ticket_choices = (
     (1, "Not used"),
     (2, "Registration"),  # face recognition
     (3, "Security control"),
-    (4, "Passport control start"),
-    (5, "Used"),
-    (6, "Passport control finish"),
-    (7, "Baggage"),
+    (4, "Used"),
+    (5, "Baggage"),
 )

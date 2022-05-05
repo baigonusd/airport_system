@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from .permissions import IsAirport
+
 from .serializers import (
     BaggageGetSerializer,
     BaggagePostSerializer,
@@ -16,6 +18,7 @@ from .serializers import (
 )
 
 from .models import Baggage, Airline, Ticket, BoardingPass
+from utils.facerecognition import verify_by_face
 
 
 # class BaggageApi(generics.GenericAPIView):
@@ -46,7 +49,7 @@ from .models import Baggage, Airline, Ticket, BoardingPass
 class BaggageApi(viewsets.ModelViewSet):
     serializer_class = BaggageGetSerializer
     create_update_serializer_class = BaggagePostSerializer
-    # permission_class = [permissions.IsAuthenticated]
+    permission_class = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Baggage.objects.all()
@@ -175,8 +178,13 @@ class BoardingApi(viewsets.ModelViewSet):
 
 
 class IinApi(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAirport]
+
+    # def get(self, request):
+    #     ip_addr = self.request.META["REMOTE_ADDR"]
+    #     return Response({"ip": ip_addr})
 
     def post(self, request, *args, **kwargs):
         iin = self.request.data.get("iin")
+        verify_by_face(iin)
         return Response({"iin": iin})

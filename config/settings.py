@@ -174,3 +174,16 @@ REST_FRAMEWORK = {
         # "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+    }
+}
+
+
+SMS_PROVIDER_URL = ENV.str("SMS_PROVIDER_URL")
+SMS_PROVIDER_USERNAME = ENV.str("SMS_PROVIDER_USERNAME")
+SMS_PROVIDER_PASSWORD = ENV.str("SMS_PROVIDER_PASSWORD")
+SMS_CODE_TTL = ENV.float("SMS_CODE_TTL")
