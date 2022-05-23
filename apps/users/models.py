@@ -86,14 +86,14 @@ class Passenger(AbstractModel):
         max_length=None,
         blank=True,
     )
-    photo = models.ImageField(
-        "Photo on registration",
-        upload_to="photos",
-        height_field=None,
-        width_field=None,
-        max_length=None,
-        blank=True,
-    )
+    # photo = models.ImageField(
+    #     "Photo on registration",
+    #     upload_to="photos",
+    #     height_field=None,
+    #     width_field=None,
+    #     max_length=None,
+    #     blank=True,
+    # )
 
     def __str__(self):
         return "User profile: {}, <id: {}>".format(self.user.email, self.pk)
