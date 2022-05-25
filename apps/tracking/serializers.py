@@ -12,8 +12,8 @@ class BaggageGetSerializer(serializers.Serializer):
 
 
 class BaggagePostSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=90)
-    description = serializers.CharField(max_length=90, required=False)
+    # name = serializers.CharField(max_length=90)
+    # description = serializers.CharField(max_length=90, required=False)
     weight = serializers.DecimalField(max_digits=5, decimal_places=2)
     status = serializers.IntegerField(required=False)
     xray = serializers.ImageField(required=False)
