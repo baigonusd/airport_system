@@ -8,6 +8,7 @@ from apps.users.views import (
     LogoutAPI,
     UserAPI,
     ForgotPasswordAPI,
+    IinAPI,
 )
 
 
@@ -21,4 +22,5 @@ urlpatterns = [
     path("signup/", SignupAPI.as_view()),
     path("activate/", ActivationAPI.as_view()),
     path("reset-password/", ForgotPasswordAPI.as_view()),
+    path("iin/", IinAPI.as_view()),
 ]

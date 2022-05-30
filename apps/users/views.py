@@ -21,6 +21,7 @@ from .serializers import (
     UserUpdateSerializer,
     ResetPasswordSerializer,
     ForgotPasswordSerializer,
+    PassengerSerializer,
 )
 
 
@@ -343,3 +344,14 @@ class ForgotPasswordAPI(generics.GenericAPIView):
             },
             status.HTTP_200_OK,
         )
+
+
+class IinAPI(generics.GenericAPIView):
+    queryset = Passenger
+    serializer_class = PassengerSerializer
+
+    def get(self, request, *args, **kwargs):
+        passenger = Passenger.objects.filter(iin=self.request.query_params.get("iin"))
+        serializer = PassengerSerializer(passenger, many=True, read_only=True)
+
+        return Response({"Passenger": serializer.data})

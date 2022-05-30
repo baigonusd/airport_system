@@ -134,7 +134,7 @@ class LoginUserSerializer(serializers.Serializer):
 
     def validate(self, data):
         user = self.authenticate(**data)
-        if user and user.is_active:
+        if user and user.is_active and user.passenger_profile.valid_number:
             return user
         raise exceptions.AuthenticationFailed()
 
