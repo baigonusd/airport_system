@@ -2,7 +2,7 @@ from django.db import transaction
 
 from rest_framework import serializers, exceptions
 
-from .models import Baggage, Airline, Ticket, BoardingPass
+from .models import Baggage, Airline, Ticket, BoardingPass, Flight
 
 
 class BaggageGetSerializer(serializers.Serializer):
@@ -36,37 +36,46 @@ class AirlineSerializer(serializers.Serializer):
         return airline_created
 
 
-class AirlineTicketSerializer(serializers.Serializer):
-    class Meta:
-        model = Airline
-        fields = ("id",)
-
-
 # class BaggageBoardingSerializer(serializers.Serializer):
 #     class Meta:
 #         model = Airline
 #         fields = ("id",)
 
 
-class TicketGetSerializer(serializers.Serializer):
-    from_location = serializers.CharField(max_length=90)
-    to_location = serializers.CharField(max_length=90)
-    time_start = serializers.DateTimeField()
-    time_finish = serializers.DateTimeField()
-    airline = AirlineTicketSerializer
-    status = serializers.IntegerField()
+# class FlightGetSerializer(serializers.Serializer):
+#     from_location = serializers.CharField(max_length=90)
+#     to_location = serializers.CharField(max_length=90)
+#     time_start = serializers.DateTimeField()
+#     time_finish = serializers.DateTimeField()
+#     airline = AirlineFlightSerializer()
 
 
-class TicketPostSerializer(serializers.ModelSerializer):
+class FlightGetSerializer(serializers.ModelSerializer):
+
+    airline = serializers.CharField(source="airline.name")
+    airline_logo = serializers.ImageField(source="airline.logo")
+
     class Meta:
-        model = Ticket
+        model = Flight
         fields = (
             "from_location",
             "to_location",
             "time_start",
             "time_finish",
             "airline",
-            "status",
+            "airline_logo",
+        )
+
+
+class FlightPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Flight
+        fields = (
+            "from_location",
+            "to_location",
+            "time_start",
+            "time_finish",
+            "airline",
         )
 
     def validate(self, data):
@@ -78,26 +87,69 @@ class TicketPostSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        ticket = Ticket.objects.create(
-            passenger=self.context["request"].user.passenger_profile, **validated_data
+        flight = Flight.objects.create(**validated_data)
+        return flight
+
+
+class TicketGetSerializer(serializers.ModelSerializer):
+    passenger_name = serializers.CharField(source="passenger.user.name")
+    passenger_surname = serializers.CharField(source="passenger.user.surname")
+    flight_from_location = serializers.CharField(source="flight.from_location")
+    flight_to_location = serializers.CharField(source="flight.to_location")
+    flight_time_start = serializers.CharField(source="flight.time_start")
+    flight_time_finish = serializers.CharField(source="flight.time_finish")
+    flight_airline = serializers.CharField(source="flight.airline.name")
+
+    class Meta:
+        model = Ticket
+        fields = (
+            "id",
+            "status",
+            "passenger",
+            "flight",
+            "passenger_name",
+            "passenger_surname",
+            "flight_from_location",
+            "flight_to_location",
+            "flight_time_start",
+            "flight_time_finish",
+            "flight_airline",
         )
+
+
+class TicketPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = "__all__"
+
+    @transaction.atomic
+    def create(self, validated_data):
+        ticket = Ticket.objects.create(**validated_data)
         return ticket
 
 
 class BoardingGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoardingPass
-        fields = ("baggages", "ticket", "sector", "number")
+        fields = ("sector", "number")
+
+
+# class BoardingBaggagesSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Baggage
+#         # depth = 3
+#         fields = "__all__"
 
 
 class BoardingPostSerializer(serializers.ModelSerializer):
-    baggages_ids = serializers.PrimaryKeyRelatedField(
-        many=True, write_only=True, queryset=Baggage.objects.all()
-    )
-
+    # baggages = serializers.PrimaryKeyRelatedField(
+    #     many=True, write_only=True, queryset=Baggage.objects.all()
+    # )
+    # baggages = BoardingBaggagesSerializer(many=True)
+    # baggages = serializers.ListField()
     class Meta:
         model = BoardingPass
-        fields = ("ticket", "sector", "number", "baggages_ids")
+        fields = ("ticket", "sector", "number", "baggages", "flight")
 
     def validate(self, data):
         if len(data.get("sector")) > 1:
@@ -109,9 +161,9 @@ class BoardingPostSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         print(validated_data)
-        baggages = validated_data.pop("baggages_ids", None)
+        # baggages = validated_data.pop("baggages", None)
         boardingpass = BoardingPass.objects.create(**validated_data)
-        print({"###############################": baggages})
-        if baggages:
-            boardingpass.baggages.set(baggages)
+        # print({"###############################": baggages})
+        # if baggages:
+        # boardingpass.baggages.set(baggages)
         return boardingpass

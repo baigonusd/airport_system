@@ -33,7 +33,7 @@ class Airline(AbstractModel):
     )
 
 
-class Ticket(AbstractModel):
+class Flight(AbstractModel):
     from_location = models.CharField("City/Country from", max_length=90)
     to_location = models.CharField("City/Country to", max_length=90)
     time_start = models.DateTimeField()
@@ -41,16 +41,32 @@ class Ticket(AbstractModel):
     airline = models.ForeignKey(
         Airline, related_name="ticket", on_delete=models.CASCADE
     )
+
+
+class Ticket(AbstractModel):
+    # from_location = models.CharField("City/Country from", max_length=90)
+    # to_location = models.CharField("City/Country to", max_length=90)
+    # time_start = models.DateTimeField()
+    # time_finish = models.DateTimeField()
+    # airline = models.ForeignKey(
+    #     Airline, related_name="ticket", on_delete=models.CASCADE
+    # )
     passenger = models.ForeignKey(
-        Passenger, related_name="ticket", on_delete=models.CASCADE
+        Passenger, related_name="tickets", on_delete=models.CASCADE
     )
     status = models.IntegerField("Status", choices=ticket_choices, default=1)
+    flight = models.ForeignKey(Flight, related_name="tickets", on_delete=models.CASCADE)
 
 
 class BoardingPass(AbstractModel):
-    baggages = models.ManyToManyField(Baggage, related_name="boarding_pass")
+    baggages = models.ForeignKey(
+        Baggage, related_name="baggages", on_delete=models.CASCADE
+    )
     ticket = models.OneToOneField(
-        Ticket, related_name="boarding_pass", on_delete=models.CASCADE
+        Ticket, related_name="tickets", on_delete=models.CASCADE
     )
     sector = models.CharField("Sector of place", max_length=1)
     number = models.IntegerField("Number of place")
+    flight = models.ForeignKey(
+        Flight, related_name="boarding", on_delete=models.CASCADE
+    )

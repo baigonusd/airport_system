@@ -15,9 +15,11 @@ from .serializers import (
     TicketPostSerializer,
     BoardingGetSerializer,
     BoardingPostSerializer,
+    FlightGetSerializer,
+    FlightPostSerializer,
 )
 
-from .models import Baggage, Airline, Ticket, BoardingPass
+from .models import Baggage, Airline, Ticket, BoardingPass, Flight
 from utils.facerecognition import verify_by_face
 
 
@@ -119,7 +121,7 @@ class TicketApi(viewsets.ModelViewSet):
     permission_class = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Ticket.objects.all()
+        return Ticket.objects.filter(passenger=self.request.user.passenger_profile)
 
     def get_serializer_class(self):
         create_update = ["create", "update", "partial_update"]
@@ -132,6 +134,38 @@ class TicketApi(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = Ticket.objects.filter(passenger=self.request.user.passenger_profile)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
+
+class FlightApi(viewsets.ModelViewSet):
+    serializer_class = FlightGetSerializer
+    create_update_serializer_class = FlightPostSerializer
+    permission_class = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Flight.objects.all()
+
+    def get_serializer_class(self):
+        create_update = ["create", "update", "partial_update"]
+        safe_actions = ["list", "retrieve"]
+        if self.action in create_update:
+            self.serializer_class = self.create_update_serializer_class
+        elif self.action in safe_actions:
+            self.serializer_class = self.serializer_class
+        return super().get_serializer_class()
+
+    def list(self, request, *args, **kwargs):
+        queryset = Flight.objects.all()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -163,7 +197,9 @@ class BoardingApi(viewsets.ModelViewSet):
         return super().get_serializer_class()
 
     def list(self, request, *args, **kwargs):
-        queryset = BoardingPass.objects.filter(ticket=self.request.data.get("ticket"))
+        queryset = BoardingPass.objects.filter(
+            flight=self.request.query_params.get("flight")
+        )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
