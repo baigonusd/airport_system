@@ -5,18 +5,27 @@ from rest_framework import serializers, exceptions
 from .models import Baggage, Airline, Ticket, BoardingPass, Flight
 
 
-class BaggageGetSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    weight = serializers.DecimalField(max_digits=5, decimal_places=2)
-    status = serializers.IntegerField()
+class BaggageGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Baggage
+        fields = "__all__"
 
 
-class BaggagePostSerializer(serializers.Serializer):
+class BaggagePostSerializer(serializers.ModelSerializer):
     # name = serializers.CharField(max_length=90)
     # description = serializers.CharField(max_length=90, required=False)
-    weight = serializers.DecimalField(max_digits=5, decimal_places=2)
-    status = serializers.IntegerField(required=False)
-    xray = serializers.ImageField(required=False)
+    # weight = serializers.DecimalField(max_digits=5, decimal_places=2)
+    # status = serializers.IntegerField(required=False)
+    # xray = serializers.ImageField(required=False)
+
+    class Meta:
+        model = Baggage
+        fields = "__all__"
+
+    # def validate(self, data):
+    #     if len(data.get("weight")) > 5:
+    #         raise serializers.ValidationError({"weight": "Too much weight"})
+    #     return super().validate(data)
 
     @transaction.atomic
     def create(self, validated_data):
@@ -149,7 +158,7 @@ class BoardingPostSerializer(serializers.ModelSerializer):
     # baggages = serializers.ListField()
     class Meta:
         model = BoardingPass
-        fields = ("ticket", "sector", "number", "baggages", "flight")
+        fields = ("ticket", "sector", "number", "flight")
 
     def validate(self, data):
         if len(data.get("sector")) > 1:

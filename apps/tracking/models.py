@@ -6,21 +6,6 @@ from utils.abstract import AbstractModel
 from utils.choices import baggage_choices, ticket_choices
 
 
-class Baggage(AbstractModel):
-    weight = models.DecimalField("Weight of baggage", max_digits=5, decimal_places=2)
-    xray = models.ImageField(
-        "Xray of baggage",
-        upload_to="xrays",
-        height_field=None,
-        width_field=None,
-        max_length=None,
-        blank=True,
-    )
-    status = models.IntegerField(
-        "Status of baggage", choices=baggage_choices, default=1
-    )
-
-
 class Airline(AbstractModel):
     name = models.CharField("Airline name", max_length=90, unique=True)
     logo = models.ImageField(
@@ -59,9 +44,6 @@ class Ticket(AbstractModel):
 
 
 class BoardingPass(AbstractModel):
-    baggages = models.ForeignKey(
-        Baggage, related_name="baggages", on_delete=models.CASCADE
-    )
     ticket = models.OneToOneField(
         Ticket, related_name="tickets", on_delete=models.CASCADE
     )
@@ -69,4 +51,22 @@ class BoardingPass(AbstractModel):
     number = models.IntegerField("Number of place")
     flight = models.ForeignKey(
         Flight, related_name="boarding", on_delete=models.CASCADE
+    )
+
+
+class Baggage(AbstractModel):
+    weight = models.DecimalField("Weight of baggage", max_digits=5, decimal_places=2)
+    xray = models.ImageField(
+        "Xray of baggage",
+        upload_to="xrays",
+        height_field=None,
+        width_field=None,
+        max_length=None,
+        blank=True,
+    )
+    boarding = models.ForeignKey(
+        BoardingPass, related_name="baggages", on_delete=models.CASCADE
+    )
+    status = models.IntegerField(
+        "Status of baggage", choices=baggage_choices, default=1
     )
