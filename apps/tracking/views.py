@@ -22,6 +22,8 @@ from .serializers import (
 from .models import Baggage, Airline, Ticket, BoardingPass, Flight
 from utils.facerecognition import verify_by_face
 
+from apps.users.models import Passenger
+
 
 # class BaggageApi(generics.GenericAPIView):
 #     permission_classes = [permissions.IsAuthenticated]
@@ -145,6 +147,27 @@ class TicketApi(viewsets.ModelViewSet):
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
+
+    @action(
+        detail=False,
+        methods=["get"],
+    )
+    def get_tickets_by_iin_or_ticketid(self, request, **kwargs):
+        passenger = Passenger.objects.filter(
+            iin=self.request.query_params.get("iin")
+        ).first()
+        if passenger:
+            ticket = Ticket.objects.filter(passenger=passenger)
+        else:
+            ticket = Ticket.objects.filter(
+                pk=self.request.query_params.get("ticket_id")
+            )
+        tickets = self.serializer_class(ticket, many=True)
+        # print(tickets.data)
+        # print(list(ticket.values()))
+
+        # return Response(list(ticket.values()))
+        return Response(tickets.data)
 
 
 class FlightApi(viewsets.ModelViewSet):

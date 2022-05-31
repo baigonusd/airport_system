@@ -99,8 +99,9 @@ class UserSerializer(serializers.ModelSerializer):
 class PassengerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Passenger
-        fields = ("mobile_phone", "valid_number")
-        read_only_fields = ("__all__",)
+        # fields = ("mobile_phone", "valid_number")
+        # read_only_fields = ("__all__",)
+        fields = "__all__"
 
 
 class LoginUserSerializer(serializers.Serializer):
