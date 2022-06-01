@@ -28,7 +28,6 @@ class UserSignupSerializer(serializers.Serializer):
     gender = serializers.IntegerField(required=True)
     password = serializers.CharField(write_only=True)
     role = serializers.IntegerField()
-    scan_udv = serializers.ImageField(use_url=True)
 
     def validate(self, data):
         if Passenger.objects.filter(number_of_doc=data["number_of_doc"]):
@@ -66,7 +65,6 @@ class UserSignupSerializer(serializers.Serializer):
         user_created.passenger_profile.gender = validated_data["gender"]
         user_created.passenger_profile.number_of_doc = validated_data["number_of_doc"]
         user_created.passenger_profile.iin = validated_data["iin"]
-        user_created.passenger_profile.scan_udv = validated_data["scan_udv"]
         user_created.passenger_profile.save()
 
         # sent = self.__send_verification_code(user_created)

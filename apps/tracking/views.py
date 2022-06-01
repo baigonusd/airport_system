@@ -21,6 +21,7 @@ from .serializers import (
 
 from .models import Baggage, Airline, Ticket, BoardingPass, Flight
 from utils.facerecognition import verify_by_face
+from utils.places import list_of_places
 
 from apps.users.models import Passenger
 
@@ -224,7 +225,8 @@ class BoardingApi(viewsets.ModelViewSet):
             flight=self.request.query_params.get("flight")
         )
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response(list_of_places(serializer.data))
+
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -237,13 +239,26 @@ class BoardingApi(viewsets.ModelViewSet):
 
 
 class IinApi(APIView):
-    permission_classes = [IsAirport]
+    # permission_classes = [IsAirport]
+    # permission_class = [permissions.IsAuthenticated]
+    # serializer_class = IinSerializer()
 
     # def get(self, request):
     #     ip_addr = self.request.META["REMOTE_ADDR"]
     #     return Response({"ip": ip_addr})
 
     def post(self, request, *args, **kwargs):
-        iin = self.request.data.get("iin")
-        verify_by_face(iin)
-        return Response({"iin": iin})
+        # start = self.request.data.get("start")
+        # file = self.request.data.get("file")
+        # iin = self.request.data.get("iin")
+        # blinking = bool(self.request.data.get("blinking"))
+        # liveness = bool(self.request.data.get("liveness"))
+        # challenge = bool(self.request.data.get("challenge"))
+        # count = self.request.data.get("count")
+        # challenge_count = self.request.data.get("challenge_count")
+        # failed = bool(self.request.data.get("failed"))
+        # print(self.request.data)
+        # print(file)
+        # resp = main_face(start=start, file=file, iin=iin, BLINKING=blinking, LIVENESS=liveness, CHALLENGE=challenge, count=count, challenge_count=challenge_count, FAILED=failed)
+        resp = "sad"
+        return Response({"Response": resp})

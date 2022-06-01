@@ -78,14 +78,7 @@ class Passenger(AbstractModel):
         ],
         unique=True,
     )
-    scan_udv = models.ImageField(
-        "Scan of document",
-        upload_to="udv",
-        height_field=None,
-        width_field=None,
-        max_length=None,
-        blank=True,
-    )
+    
     # photo = models.ImageField(
     #     "Photo on registration",
     #     upload_to="photos",
